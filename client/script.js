@@ -1,25 +1,27 @@
-const url = 'http://localhost:3000/users';
+const url ='http://localhost:3000/cars';
 
 window.addEventListener('load', fetchData);
+
+const carForm = document.getElementById('carForm');
 
 function fetchData() {
   fetch(url)
     .then((result) => result.json())
-    .then((users) => {
-      if (users.length > 0) {
+    .then((cars) => {
+      if (cars.length > 0) {
         let html = `<ul class="w-3/4 my-3 mx-auto flex flex-wrap gap-2 justify-center">`;
-        users.forEach((user) => {
+        cars.forEach((car) => {
           html += `
         <li
-          class="bg-${user.color}-200 basis-1/4 text-${user.color}-900 p-2 rounded-md border-2 border-${user.color}-400 flex flex-col justify-between">
-          <h3>${user.firstName} ${user.lastName}</h3>
-          <p>Användarnamn: ${user.username}</p>
+          class="bg-${car.color}-200 basis-1/4 text-${car.color}-900 p-2 rounded-md border-2 border-${car.color}-400 flex flex-col justify-between">
+          <h3>${car.brand} ${car.model}</h3>
+          <p>År: ${car.year}</p>
           <div>
             <button
-              class="border border-${user.color}-300 hover:bg-white/100 rounded-md bg-white/50 p-1 text-sm mt-2" onclick="setCurrentUser(${user.id})">
+              class="border border-${car.color}-300 hover:bg-white/100 rounded-md bg-white/50 p-1 text-sm mt-2" onclick="setCurrentCar(${car.id})">
               Ändra
             </button>
-            <button class="border border-${user.color}-300 hover:bg-white/100 rounded-md bg-white/50 p-1 text-sm mt-2" onclick="deleteUser(${user.id})">
+            <button class="border border-${car.color}-300 hover:bg-white/100 rounded-md bg-white/50 p-1 text-sm mt-2" onclick="deleteCar(${car.id})">
               Ta bort
             </button>
           </div>
@@ -30,63 +32,67 @@ function fetchData() {
         const listContainer = document.getElementById('listContainer');
         listContainer.innerHTML = '';
         listContainer.insertAdjacentHTML('beforeend', html);
+      } else {
+        const listContainer = document.getElementById('listContainer');
+        listContainer.innerHTML = `<p class="text-center mt-6 opacity-80">Inga bilar sparade ännu.</p>`;
       }
     });
 }
 
-function setCurrentUser(id) {
+function setCurrentCar(id) {
   console.log('current', id);
 
   fetch(`${url}/${id}`)
     .then((result) => result.json())
-    .then((user) => {
-      console.log(user);
-      userForm.firstName.value = user.firstName;
-      userForm.lastName.value = user.lastName;
-      userForm.color.value = user.color;
-      userForm.username.value = user.username;
+    .then((car) => {
+      console.log(car);
+      carForm.brand.value = car.brand;
+      carForm.model.value = car.model;
+      carForm.year.value = car.year;
+      carForm.color.value = car.color;
 
-      localStorage.setItem('currentId', user.id);
+      localStorage.setItem('currentId', car.id);
     });
 }
 
-function deleteUser(id) {
+function deleteCar(id) {
   console.log('delete', id);
-  fetch(`${url}/${id}`, { method: 'DELETE' }).then((result) => fetchData());
+  fetch(`${url}/${id}`, { method: 'DELETE' }).then(() => fetchData());
 }
 
-userForm.addEventListener('submit', handleSubmit);
+carForm.addEventListener('submit', handleSubmit);
 
 function handleSubmit(e) {
   e.preventDefault();
-  const serverUserObject = {
-    firstName: '',
-    lastName: '',
-    username: '',
+
+  const serverCarObject = {
+    brand: '',
+    model: '',
+    year: '',
     color: ''
   };
-  serverUserObject.firstName = userForm.firstName.value;
-  serverUserObject.lastName = userForm.lastName.value;
-  serverUserObject.username = userForm.username.value;
-  serverUserObject.color = userForm.color.value;
+
+  serverCarObject.brand = carForm.brand.value;
+  serverCarObject.model = carForm.model.value;
+  serverCarObject.year = Number(carForm.year.value);
+  serverCarObject.color = carForm.color.value;
 
   const id = localStorage.getItem('currentId');
   if (id) {
-    serverUserObject.id = id;
+    serverCarObject.id = id;
   }
 
   const request = new Request(url, {
-    method: serverUserObject.id ? 'PUT' : 'POST',
+    method: serverCarObject.id ? 'PUT' : 'POST',
     headers: {
       'content-type': 'application/json'
     },
-    body: JSON.stringify(serverUserObject)
+    body: JSON.stringify(serverCarObject)
   });
 
-  fetch(request).then((response) => {
+  fetch(request).then(() => {
     fetchData();
-
     localStorage.removeItem('currentId');
-    userForm.reset();
+    carForm.reset();
   });
 }

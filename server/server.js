@@ -1,7 +1,7 @@
 /* Importera npm-paket sqlite3 med hjälp av require() och lagrar i variabeln sqlite */
 const sqlite = require('sqlite3').verbose();
 /* Skapar ny koppling till databas-fil som skapades tidigare. */
-const db = new sqlite.Database('./gik339.db');
+const db = new sqlite.Database('./gik339_old.db');
 
 /* Importerar npm-paket express och lagrar i variabeln express */
 const express = require('express');
@@ -30,9 +30,9 @@ server.listen(3000, () => {
 });
 
 /* Hantering av GET-requests till endpointen /users */
-server.get('/users', (req, res) => {
+server.get('/cars', (req, res) => {
   /* sql-query för att hämta alla users ur databasen. */
-  const sql = 'SELECT * FROM users';
+  const sql = 'SELECT * FROM cars';
   /* Anrop till db-objektets funktion .all som används till att hämta upp rader ur en tabell */
   db.all(sql, (err, rows) => {
     /* Callbackfunktionen har parametern err för att lagra eventuella fel */
@@ -46,10 +46,10 @@ server.get('/users', (req, res) => {
   });
 });
 
-server.get('/users/:id', (req, res) => {
+server.get('/cars/:id', (req, res) => {
   const id = req.params.id;
 
-  const sql = `SELECT * FROM users WHERE id=${id}`;
+  const sql = `SELECT * FROM cars WHERE id=${id}`;
 
   db.all(sql, (err, rows) => {
     if (err) {
@@ -60,60 +60,64 @@ server.get('/users/:id', (req, res) => {
   });
 });
 
-server.post('/users', (req, res) => {
-  const user = req.body;
-  const sql = `INSERT INTO users(firstName, lastName, username, color) VALUES (?,?,?,?)`;
+server.post('/cars', (req, res) => {
+  const car = req.body;
+  const sql = `INSERT INTO cars(brand, model, year, color) VALUES (?,?,?,?)`;
 
-  db.run(sql, Object.values(user), (err) => {
+  const values = [car.brand, car.model, car.year, car.color];
+
+  db.run(sql, values, (err) => {
     if (err) {
       console.log(err);
       res.status(500).send(err);
     } else {
-      res.send('Användaren sparades');
+      res.send('Bilen sparades');
     }
   });
 });
 
-server.put('/users', (req, res) => {
+
+server.put('/cars', (req, res) => {
   const bodyData = req.body;
 
   const id = bodyData.id;
-  const user = {
-    firstName: bodyData.firstName,
-    lastName: bodyData.lastName,
-    username: bodyData.username,
+  const car = {
+    brand: bodyData.brand,
+    model: bodyData.model,
+    year: bodyData.year,
     color: bodyData.color
   };
 
-  let updateString = '';
-  const columnsArray = Object.keys(user);
+   let updateString = '';
+  const columnsArray = Object.keys(car);
   columnsArray.forEach((column, i) => {
-    updateString += `${column}="${user[column]}"`;
+    updateString += `${column}="${car[column]}"`;
     if (i !== columnsArray.length - 1) updateString += ',';
   });
-  const sql = `UPDATE users SET ${updateString} WHERE id=${id}`;
+
+  const sql = `UPDATE cars SET ${updateString} WHERE id=${id}`;
 
   db.run(sql, (err) => {
     if (err) {
       console.log(err);
       res.status(500).send(err);
     } else {
-      res.send('Användaren uppdaterades');
+      res.send('Bilen uppdaterades');
     }
   });
   //UPDATE users SET firstName="Mikaela",lastName="Hedberg" WHERE id=1
 });
 
-server.delete('/users/:id', (req, res) => {
+server.delete('/cars/:id', (req, res) => {
   const id = req.params.id;
-  const sql = `DELETE FROM users WHERE id = ${id}`;
+  const sql = `DELETE FROM cars WHERE id = ${id}`;
 
   db.run(sql, (err) => {
     if (err) {
       console.log(err);
       res.status(500).send(err);
     } else {
-      res.send('Användaren borttagen');
+      res.send('Bilen borttagen');
     }
   });
 });
