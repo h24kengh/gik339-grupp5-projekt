@@ -1,10 +1,10 @@
 /* Importera npm-paket sqlite3 med hjälp av require() och lagrar i variabeln sqlite */
-const sqlite = require('sqlite3').verbose();
+const sqlite = require("sqlite3").verbose();
 /* Skapar ny koppling till databas-fil som skapades tidigare. */
-const db = new sqlite.Database('./gik339_old.db');
+const db = new sqlite.Database("./gik339_old.db");
 
 /* Importerar npm-paket express och lagrar i variabeln express */
-const express = require('express');
+const express = require("express");
 /* Skapar server med hjälp av express */
 const server = express();
 
@@ -16,9 +16,9 @@ server
   .use(express.urlencoded({ extended: false }))
   .use((req, res, next) => {
     /* Headers för alla förfrågningar. Hanterar regler för CORS (vilka klienter som får anropa vår server och hur.) */
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', '*');
-    res.header('Access-Control-Allow-Methods', '*');
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "*");
+    res.header("Access-Control-Allow-Methods", "*");
     /* Säger åt servern att fortsätta processa förfrågan */
     next();
   });
@@ -26,13 +26,13 @@ server
 /* Startar servern på port 3000 */
 server.listen(3000, () => {
   /* Meddelande för feedback att servern körs */
-  console.log('Server running on http://localhost:3000');
+  console.log("Server running on http://localhost:3000");
 });
 
 /* Hantering av GET-requests till endpointen /users */
-server.get('/cars', (req, res) => {
-  /* sql-query för att hämta alla users ur databasen. */
-  const sql = 'SELECT * FROM cars';
+server.get("/cars", (req, res) => {
+  /* sql-query för att hämta alla cars ur databasen. */
+  const sql = "SELECT * FROM cars";
   /* Anrop till db-objektets funktion .all som används till att hämta upp rader ur en tabell */
   db.all(sql, (err, rows) => {
     /* Callbackfunktionen har parametern err för att lagra eventuella fel */
@@ -46,7 +46,7 @@ server.get('/cars', (req, res) => {
   });
 });
 
-server.get('/cars/:id', (req, res) => {
+server.get("/cars/:id", (req, res) => {
   const id = req.params.id;
 
   const sql = `SELECT * FROM cars WHERE id=${id}`;
@@ -60,7 +60,7 @@ server.get('/cars/:id', (req, res) => {
   });
 });
 
-server.post('/cars', (req, res) => {
+server.post("/cars", (req, res) => {
   const car = req.body;
   const sql = `INSERT INTO cars(brand, model, year, color) VALUES (?,?,?,?)`;
 
@@ -71,13 +71,12 @@ server.post('/cars', (req, res) => {
       console.log(err);
       res.status(500).send(err);
     } else {
-      res.send('Bilen sparades');
+      res.send("Bilen sparades");
     }
   });
 });
 
-
-server.put('/cars', (req, res) => {
+server.put("/cars", (req, res) => {
   const bodyData = req.body;
 
   const id = bodyData.id;
@@ -85,14 +84,14 @@ server.put('/cars', (req, res) => {
     brand: bodyData.brand,
     model: bodyData.model,
     year: bodyData.year,
-    color: bodyData.color
+    color: bodyData.color,
   };
 
-   let updateString = '';
+  let updateString = "";
   const columnsArray = Object.keys(car);
   columnsArray.forEach((column, i) => {
     updateString += `${column}="${car[column]}"`;
-    if (i !== columnsArray.length - 1) updateString += ',';
+    if (i !== columnsArray.length - 1) updateString += ",";
   });
 
   const sql = `UPDATE cars SET ${updateString} WHERE id=${id}`;
@@ -102,13 +101,13 @@ server.put('/cars', (req, res) => {
       console.log(err);
       res.status(500).send(err);
     } else {
-      res.send('Bilen uppdaterades');
+      res.send("Bilen uppdaterades");
     }
   });
-  //UPDATE users SET firstName="Mikaela",lastName="Hedberg" WHERE id=1
+  //UPDATE cars SET firstName="Mikaela",lastName="Hedberg" WHERE id=1
 });
 
-server.delete('/cars/:id', (req, res) => {
+server.delete("/cars/:id", (req, res) => {
   const id = req.params.id;
   const sql = `DELETE FROM cars WHERE id = ${id}`;
 
@@ -117,7 +116,7 @@ server.delete('/cars/:id', (req, res) => {
       console.log(err);
       res.status(500).send(err);
     } else {
-      res.send('Bilen borttagen');
+      res.send("Bilen borttagen");
     }
   });
 });
