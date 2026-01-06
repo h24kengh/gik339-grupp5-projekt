@@ -104,7 +104,6 @@ server.put("/cars", (req, res) => {
       res.send("Bilen uppdaterades");
     }
   });
-  //UPDATE cars SET firstName="Mikaela",lastName="Hedberg" WHERE id=1
 });
 
 server.delete("/cars/:id", (req, res) => {

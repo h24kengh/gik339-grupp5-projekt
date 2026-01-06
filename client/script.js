@@ -1,8 +1,8 @@
-const url ='http://localhost:3000/cars';
+const url = "http://localhost:3000/cars";
 
-window.addEventListener('load', fetchData);
+window.addEventListener("load", fetchData);
 
-const carForm = document.getElementById('carForm');
+const carForm = document.getElementById("carForm");
 
 function fetchData() {
   fetch(url)
@@ -29,18 +29,18 @@ function fetchData() {
         });
         html += `</ul>`;
 
-        const listContainer = document.getElementById('listContainer');
-        listContainer.innerHTML = '';
-        listContainer.insertAdjacentHTML('beforeend', html);
+        const listContainer = document.getElementById("listContainer");
+        listContainer.innerHTML = "";
+        listContainer.insertAdjacentHTML("beforeend", html);
       } else {
-        const listContainer = document.getElementById('listContainer');
+        const listContainer = document.getElementById("listContainer");
         listContainer.innerHTML = `<p class="text-center mt-6 opacity-80">Inga bilar sparade ännu.</p>`;
       }
     });
 }
 
 function setCurrentCar(id) {
-  console.log('current', id);
+  console.log("current", id);
 
   fetch(`${url}/${id}`)
     .then((result) => result.json())
@@ -51,25 +51,25 @@ function setCurrentCar(id) {
       carForm.year.value = car.year;
       carForm.color.value = car.color;
 
-      localStorage.setItem('currentId', car.id);
+      localStorage.setItem("currentId", car.id);
     });
 }
 
 function deleteCar(id) {
-  console.log('delete', id);
-  fetch(`${url}/${id}`, { method: 'DELETE' }).then(() => fetchData());
+  console.log("delete", id);
+  fetch(`${url}/${id}`, { method: "DELETE" }).then(() => fetchData());
 }
 
-carForm.addEventListener('submit', handleSubmit);
+carForm.addEventListener("submit", handleSubmit);
 
 function handleSubmit(e) {
   e.preventDefault();
 
   const serverCarObject = {
-    brand: '',
-    model: '',
-    year: '',
-    color: ''
+    brand: "",
+    model: "",
+    year: "",
+    color: "",
   };
 
   serverCarObject.brand = carForm.brand.value;
@@ -77,22 +77,22 @@ function handleSubmit(e) {
   serverCarObject.year = Number(carForm.year.value);
   serverCarObject.color = carForm.color.value;
 
-  const id = localStorage.getItem('currentId');
+  const id = localStorage.getItem("currentId");
   if (id) {
     serverCarObject.id = id;
   }
 
   const request = new Request(url, {
-    method: serverCarObject.id ? 'PUT' : 'POST',
+    method: serverCarObject.id ? "PUT" : "POST",
     headers: {
-      'content-type': 'application/json'
+      "content-type": "application/json",
     },
-    body: JSON.stringify(serverCarObject)
+    body: JSON.stringify(serverCarObject),
   });
 
   fetch(request).then(() => {
     fetchData();
-    localStorage.removeItem('currentId');
+    localStorage.removeItem("currentId");
     carForm.reset();
   });
 }
